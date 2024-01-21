@@ -20,15 +20,15 @@ public class MainMenu implements MenuView {
         int userChoice = UserAction.getUserChoice(MENU_OPTION_COUNT);
         switch (userChoice) {
             case 1:
-                FtpServerConnectionMenu ftpServerConnectionMenu = new FtpServerConnectionMenu();
+                FtpServerConnectionMenu ftpServerConnectionMenu
+                        = new FtpServerConnectionMenu();
                 ftpServerConnectionMenu.showMenu();
-                break;
             case 2:
                 System.out.println("Выход из приложения...");
                 break;
             default:
+                this.showMenu();
                 break;
         }
     }
-
 }

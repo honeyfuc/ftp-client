@@ -34,4 +34,12 @@ public class UserAction {
             return e.getMessage();
         }
     }
+
+    public static String getFilePath() {
+        try {
+            return console.nextLine().trim();
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+    }
 }
