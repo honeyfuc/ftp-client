@@ -66,15 +66,35 @@ public class FTPClient {
     }
 
     public void uploadFile(String filePath) {
-        try (InputStream inputStream = Files.newInputStream(Paths.get(filePath));
-             BufferedInputStream input = new BufferedInputStream(inputStream)) {
+        if (!isConnected) {
+            System.out.println("WARNING! Клиент не подключен к серверу");
+        }
 
+        if (filePath != null && !filePath.isEmpty()) {
+            sendRequest("STOR " + filePath);
+            try (InputStream inputStream = Files.newInputStream(Paths.get(filePath))) {
+                String serverResponse = serverReader.readLine();
+                if (serverResponse.startsWith("150")) {
+                    OutputStream outputStream = transferSocket.getOutputStream();
 
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+                    byte[] buffer = new byte[8192];
+                    int byteElement;
+                    while ((byteElement = inputStream.read(buffer)) != -1) {
+                        outputStream.write(buffer, 0, byteElement);
+                    }
+
+                    outputStream.flush();
+                    outputStream.close();
+                    String response = serverReader.readLine();
+                    System.out.println();
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
+    //C:\Users\Yaroslav\IDEA-Projects\infotecs\test-task\ftp-client\src\main\resources\static\students-mock.json
     public void activatePassiveMode() {
         sendRequest("PASV");
         String serverResponse;
