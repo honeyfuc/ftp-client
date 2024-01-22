@@ -96,7 +96,6 @@ public class FTPClient {
                 outputStream.close();
                 inputStream.close();
                 String response = serverReader.readLine();
-                serverReader.readLine();
                 if (response.startsWith("226")) {
                     file = filePath;
                     return true;
@@ -198,7 +197,11 @@ public class FTPClient {
             serverResponse = serverReader.readLine();
             if (serverResponse.startsWith("230")) {
                 isConnected = true;
+            } else {
+                throw new FtpServerConnectionException("Ошибка при соединении с FTP сервером");
             }
+        } else {
+            throw new FtpServerConnectionException("Ошибка при соединении с FTP сервером");
         }
     }
 

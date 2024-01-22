@@ -42,4 +42,8 @@ public class UserAction {
             return e.getMessage();
         }
     }
+
+    public static Long getUserId() {
+        return console.nextLong();
+    }
 }
