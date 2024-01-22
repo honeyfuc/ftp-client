@@ -13,6 +13,8 @@ public class ServerInteractionMenu implements MenuView {
 
     private final int MENU_OPTION_COUNT = 3;
 
+    private FTPClient ftpClient = FTPClient.getInstance();
+
     @Override
     public void showMenu() {
         System.out.println("\n     Действия     ");
@@ -28,10 +30,8 @@ public class ServerInteractionMenu implements MenuView {
         int userChoice = UserAction.getUserChoice(MENU_OPTION_COUNT);
         switch (userChoice) {
             case 1:
-                getServerMode();
                 System.out.print("Введите путь до файла, который хотите загрузить: ");
                 String file = UserAction.getFilePath();
-                FTPClient ftpClient = FTPClient.getInstance();
                 boolean isUploaded = false;
                 try {
                     isUploaded = ftpClient.uploadFile(file);
@@ -41,8 +41,7 @@ public class ServerInteractionMenu implements MenuView {
                 getToNextStep(file, isUploaded);
                 break;
             case 2:
-                FileInteractionMenu fileInteractionMenu = new FileInteractionMenu(StudentService.getInstance());
-                fileInteractionMenu.showMenu();
+                showFileInteractionMenu();
                 break;
             default:
                 this.showMenu();
@@ -50,9 +49,9 @@ public class ServerInteractionMenu implements MenuView {
         }
     }
 
-    private static void getServerMode() {
-        ServerModeMenu serverModeMenu = new ServerModeMenu();
-        serverModeMenu.showMenu();
+    private static void showFileInteractionMenu() {
+        FileInteractionMenu fileInteractionMenu = new FileInteractionMenu(StudentService.getInstance());
+        fileInteractionMenu.showMenu();
     }
 
     private void getToNextStep(String file, boolean isUploaded) {

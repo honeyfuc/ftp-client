@@ -30,6 +30,8 @@ public class FTPClient {
 
     private BufferedWriter serverWriter;
 
+    private String file;
+
     private ByteArrayOutputStream fileBuffer;
 
     private final Integer PORT = 21;
@@ -73,6 +75,11 @@ public class FTPClient {
         }
 
         if (filePath != null && !filePath.isEmpty()) {
+            if (serverMode == ServerMode.PASSIVE) {
+                activatePassiveMode();
+            } else {
+
+            }
             sendRequest("STOR " + filePath);
             String serverResponse = serverReader.readLine();
             if (serverResponse.startsWith("150")) {
@@ -89,7 +96,9 @@ public class FTPClient {
                 outputStream.close();
                 inputStream.close();
                 String response = serverReader.readLine();
+                serverReader.readLine();
                 if (response.startsWith("226")) {
+                    file = filePath;
                     return true;
                 }
             }
@@ -98,13 +107,15 @@ public class FTPClient {
     }
 
     public boolean downloadFile(String fileName) {
-
+        if (serverMode == ServerMode.PASSIVE) {
+            activatePassiveMode();
+        }
         try {
             sendRequest("RETR " + fileName);
             String serverResponse = serverReader.readLine();
             if (serverResponse.startsWith("1")) {
                 InputStream inputStream = transferSocket.getInputStream();
-
+                fileBuffer = new ByteArrayOutputStream();
                 byte[] buffer = new byte[8192];
                 int byteElement;
                 while ((byteElement = inputStream.read(buffer)) != -1) {
@@ -139,7 +150,6 @@ public class FTPClient {
             serverPort = getServerPort(serverResponseInfo);
 
             transferSocket = new Socket(serverHost, serverPort);
-            serverMode = ServerMode.PASSIVE;
 
             System.out.println("SUCCESSFUL !!! Пассивный режим успешно включен! Адресс: " + serverHost + ". Порт " + serverPort);
 
@@ -249,5 +259,17 @@ public class FTPClient {
 
     public void setFileBuffer(ByteArrayOutputStream fileBuffer) {
         this.fileBuffer = fileBuffer;
+    }
+
+    public String getFile() {
+        return file;
+    }
+
+    public ServerMode getServerMode() {
+        return serverMode;
+    }
+
+    public void setServerMode(ServerMode serverMode) {
+        this.serverMode = serverMode;
     }
 }

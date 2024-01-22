@@ -1,6 +1,7 @@
 package ru.yankovyaroslav.ftp.menu.impl;
 
 import ru.yankovyaroslav.ftp.client.FTPClient;
+import ru.yankovyaroslav.ftp.domain.ServerMode;
 import ru.yankovyaroslav.ftp.menu.MenuView;
 import ru.yankovyaroslav.ftp.util.UserAction;
 
@@ -9,6 +10,8 @@ import java.awt.*;
 public class ServerModeMenu implements MenuView {
 
     private final int MENU_OPTION_COUNT = 2;
+
+    private FTPClient ftpClient = FTPClient.getInstance();
     @Override
     public void showMenu() {
         System.out.println("\n     Режимы работы     ");
@@ -22,8 +25,8 @@ public class ServerModeMenu implements MenuView {
         int userChoice = UserAction.getUserChoice(MENU_OPTION_COUNT);
         switch (userChoice) {
             case 1:
-                FTPClient ftpClient = FTPClient.getInstance();
-                ftpClient.activatePassiveMode();
+                ftpClient.setServerMode(ServerMode.PASSIVE);
+                showServerInteractionMenu();
                 break;
             case 2:
                 System.out.println("Выход из приложения...");
@@ -32,6 +35,11 @@ public class ServerModeMenu implements MenuView {
                 this.showMenu();
                 break;
         }
+    }
+
+    private static void showServerInteractionMenu() {
+        ServerInteractionMenu serverInteractionMenu = new ServerInteractionMenu();
+        serverInteractionMenu.showMenu();
     }
 
 }

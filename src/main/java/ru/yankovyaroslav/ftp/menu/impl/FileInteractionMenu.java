@@ -1,5 +1,6 @@
 package ru.yankovyaroslav.ftp.menu.impl;
 
+import ru.yankovyaroslav.ftp.domain.exception.FileDataException;
 import ru.yankovyaroslav.ftp.menu.MenuView;
 import ru.yankovyaroslav.ftp.service.StudentService;
 import ru.yankovyaroslav.ftp.util.UserAction;
@@ -21,7 +22,7 @@ public class FileInteractionMenu implements MenuView {
         System.out.println("2. Получить информацию о студенте по id");
         System.out.println("3. Добавить студента");
         System.out.println("4. Удалить студента по id");
-        System.out.println("5. Завершение работы");
+        System.out.println("5. Назад");
         handleMenuOption();
     }
 
@@ -31,6 +32,7 @@ public class FileInteractionMenu implements MenuView {
         switch (userChoice) {
             case 1:
                 studentService.getAllStudents();
+                showMenu();
                 break;
             case 2:
                 studentService.getStudentById();
@@ -42,12 +44,17 @@ public class FileInteractionMenu implements MenuView {
                 studentService.deleteStudentById();
                 break;
             case 5:
-                System.out.println("Выход из приложения...");
+                showServerInteractionMenu();
                 break;
             default:
                 this.showMenu();
                 break;
         }
+    }
+
+    private static void showServerInteractionMenu() {
+        ServerInteractionMenu serverInteractionMenu = new ServerInteractionMenu();
+        serverInteractionMenu.showMenu();
     }
 
 }
