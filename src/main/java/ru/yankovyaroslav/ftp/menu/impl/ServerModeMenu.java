@@ -24,8 +24,7 @@ public class ServerModeMenu implements MenuView {
             case 1:
                 FTPClient ftpClient = FTPClient.getInstance();
                 ftpClient.activatePassiveMode();
-                ServerInteractionMenu serverInteractionMenu = new ServerInteractionMenu();
-                serverInteractionMenu.showMenu();
+                break;
             case 2:
                 System.out.println("Выход из приложения...");
                 break;

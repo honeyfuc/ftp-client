@@ -30,6 +30,8 @@ public class FTPClient {
 
     private BufferedWriter serverWriter;
 
+    private ByteArrayOutputStream fileBuffer;
+
     private final Integer PORT = 21;
     private static FTPClient instance;
 
@@ -65,33 +67,59 @@ public class FTPClient {
         }
     }
 
-    public void uploadFile(String filePath) {
+    public boolean uploadFile(String filePath) throws IOException {
         if (!isConnected) {
             System.out.println("WARNING! Клиент не подключен к серверу");
         }
 
         if (filePath != null && !filePath.isEmpty()) {
             sendRequest("STOR " + filePath);
-            try (InputStream inputStream = Files.newInputStream(Paths.get(filePath))) {
-                String serverResponse = serverReader.readLine();
-                if (serverResponse.startsWith("150")) {
-                    OutputStream outputStream = transferSocket.getOutputStream();
+            String serverResponse = serverReader.readLine();
+            if (serverResponse.startsWith("150")) {
+                InputStream inputStream = Files.newInputStream(Paths.get(filePath));
+                OutputStream outputStream = transferSocket.getOutputStream();
 
-                    byte[] buffer = new byte[8192];
-                    int byteElement;
-                    while ((byteElement = inputStream.read(buffer)) != -1) {
-                        outputStream.write(buffer, 0, byteElement);
-                    }
-
-                    outputStream.flush();
-                    outputStream.close();
-                    String response = serverReader.readLine();
-                    System.out.println();
+                byte[] buffer = new byte[8192];
+                int byteElement;
+                while ((byteElement = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, byteElement);
                 }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+
+                outputStream.flush();
+                outputStream.close();
+                inputStream.close();
+                String response = serverReader.readLine();
+                if (response.startsWith("226")) {
+                    return true;
+                }
             }
         }
+        return false;
+    }
+
+    public boolean downloadFile(String fileName) {
+
+        try {
+            sendRequest("RETR " + fileName);
+            String serverResponse = serverReader.readLine();
+            if (serverResponse.startsWith("1")) {
+                InputStream inputStream = transferSocket.getInputStream();
+
+                byte[] buffer = new byte[8192];
+                int byteElement;
+                while ((byteElement = inputStream.read(buffer)) != -1) {
+                    fileBuffer.write(buffer, 0, byteElement);
+                }
+                inputStream.close();
+                serverResponse = serverReader.readLine();
+                if (serverResponse.startsWith("2")) {
+                    return true;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     //C:\Users\Yaroslav\IDEA-Projects\infotecs\test-task\ftp-client\src\main\resources\static\students-mock.json
@@ -113,7 +141,7 @@ public class FTPClient {
             transferSocket = new Socket(serverHost, serverPort);
             serverMode = ServerMode.PASSIVE;
 
-            System.out.println("Пассивный режим успешно включен! Адресс: " + serverHost + ". Порт " + serverPort);
+            System.out.println("SUCCESSFUL !!! Пассивный режим успешно включен! Адресс: " + serverHost + ". Порт " + serverPort);
 
         } catch (FtpServerConnectionException e) {
             System.out.println("Возникла ошибка при включении Пассивного режима работы");
@@ -215,4 +243,11 @@ public class FTPClient {
         isConnected = connected;
     }
 
+    public ByteArrayOutputStream getFileBuffer() {
+        return fileBuffer;
+    }
+
+    public void setFileBuffer(ByteArrayOutputStream fileBuffer) {
+        this.fileBuffer = fileBuffer;
+    }
 }

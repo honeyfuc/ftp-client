@@ -18,9 +18,9 @@ public class UserAction {
                 throw new MenuOutOfRangeException("Выбранное значение не удовлетворяет данному Меню.");
             }
         } catch (MenuOutOfRangeException e) {
-            System.out.println("Выбранного вами пункта нет в Меню.");
+            System.out.println("WARNING !!! Выбранного вами пункта нет в Меню.");
         } catch (InputMismatchException e) {
-            System.out.println("Введите числовое значени пункта Меню.");
+            System.out.println("WARNING !!! Введите числовое значени пункта Меню.");
         }
         console.nextLine();
         return userChoice;

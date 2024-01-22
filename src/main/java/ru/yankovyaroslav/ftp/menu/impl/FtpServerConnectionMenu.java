@@ -19,7 +19,7 @@ public class FtpServerConnectionMenu implements MenuView {
         boolean isConnected = connectServer(ftpServerIp, username, password);
 
         if (isConnected) {
-            showServerModeMenu();
+            showServerInteractionMenu();
         }
     }
 
@@ -35,9 +35,9 @@ public class FtpServerConnectionMenu implements MenuView {
         return ftpClient.isConnected();
     }
 
-    private static void showServerModeMenu() {
-        ServerModeMenu serverModeMenu = new ServerModeMenu();
-        serverModeMenu.showMenu();
+    private static void showServerInteractionMenu() {
+        ServerInteractionMenu serverInteractionMenu = new ServerInteractionMenu();
+        serverInteractionMenu.showMenu();
     }
 
     @Override
