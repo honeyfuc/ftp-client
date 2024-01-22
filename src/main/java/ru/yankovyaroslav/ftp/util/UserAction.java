@@ -46,4 +46,8 @@ public class UserAction {
     public static Long getUserId() {
         return console.nextLong();
     }
+
+    public static String getUsername() {
+        return console.nextLine().trim();
+    }
 }

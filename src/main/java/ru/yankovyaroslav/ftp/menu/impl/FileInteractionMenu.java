@@ -40,6 +40,7 @@ public class FileInteractionMenu implements MenuView {
                 break;
             case 3:
                 studentService.addNewStudent();
+                showMenu();
                 break;
             case 4:
                 studentService.deleteStudentById();

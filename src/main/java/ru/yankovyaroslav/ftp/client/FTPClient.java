@@ -73,12 +73,9 @@ public class FTPClient {
         if (!isConnected) {
             System.out.println("WARNING! Клиент не подключен к серверу");
         }
-
         if (filePath != null && !filePath.isEmpty()) {
-            if (serverMode == ServerMode.PASSIVE) {
+            if (serverMode == ServerMode.PASSIVE && transferSocket == null) {
                 activatePassiveMode();
-            } else {
-
             }
             sendRequest("STOR " + filePath);
             String serverResponse = serverReader.readLine();
@@ -106,9 +103,7 @@ public class FTPClient {
     }
 
     public boolean downloadFile(String fileName) {
-        if (serverMode == ServerMode.PASSIVE) {
-            activatePassiveMode();
-        }
+        activatePassiveMode();
         try {
             sendRequest("RETR " + fileName);
             String serverResponse = serverReader.readLine();
@@ -132,7 +127,25 @@ public class FTPClient {
         return false;
     }
 
-    //C:\Users\Yaroslav\IDEA-Projects\infotecs\test-task\ftp-client\src\main\resources\static\students-mock.json
+    public void updateFileOnServer(ByteArrayOutputStream outputStream) {
+
+        activatePassiveMode();
+
+        try {
+            if (file != null && !file.isEmpty()) {
+                sendRequest("STOR " + file);
+                String serverResponse = serverReader.readLine();
+            }
+            OutputStream socketOutputStream = transferSocket.getOutputStream();
+            socketOutputStream.write(outputStream.toByteArray());
+            socketOutputStream.flush();
+            socketOutputStream.close();
+            serverReader.readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void activatePassiveMode() {
         sendRequest("PASV");
         String serverResponse;

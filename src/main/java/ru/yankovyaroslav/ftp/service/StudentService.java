@@ -5,12 +5,11 @@ import ru.yankovyaroslav.ftp.domain.exception.FileDataException;
 import ru.yankovyaroslav.ftp.domain.student.Student;
 import ru.yankovyaroslav.ftp.util.UserAction;
 
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonObject;
-import javax.json.JsonValue;
+import javax.json.*;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -48,16 +47,57 @@ public class StudentService {
         }
     }
 
+    public void addNewStudent() {
+        boolean isDownloaded = ftpClient.downloadFile(ftpClient.getFile());
+        if (isDownloaded) {
+            System.out.print("Введите имя нового студента: ");
+            String username = UserAction.getUsername();
+            JsonObject jsonObject = readFileDataToJsonObject();
+            if (jsonObject != null) {
+                JsonArray jsonArray = jsonObject.getJsonArray("students");
+
+                long currentMaxId = 0;
+                for (JsonValue value : jsonArray) {
+                    JsonObject studentObject = (JsonObject) value;
+                    long studentId = (long) studentObject.getInt("id");
+                    if (studentId > currentMaxId) {
+                        currentMaxId = studentId;
+                    }
+                }
+
+                long nextStudentId = currentMaxId + 1;
+
+                JsonObject newStudentJsonObject = Json.createObjectBuilder()
+                        .add("id", nextStudentId)
+                        .add("name",username)
+                        .build();
+
+                JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder(jsonArray)
+                        .add(newStudentJsonObject);
+
+                JsonObject updatedJsonObject = Json.createObjectBuilder(jsonObject)
+                        .add("students", jsonArrayBuilder)
+                        .build();
+
+                writeUpdatedFileToServer(updatedJsonObject);
+            }
+        } else {
+            System.out.println("\nОшибка! Вероятно, вы не загрузили файл на сервер.\nПопробуйте снова )))");
+        }
+    }
+
     public void getStudentById() {
         boolean isDownloaded = ftpClient.downloadFile(ftpClient.getFile());
         if (isDownloaded) {
             System.out.print("Введите id студента: ");
-            Long id = UserAction.getUserId();
+            long id = UserAction.getUserId();
             List<Student> students = getStudents();
-            Optional<Student> student = students.stream().filter(x -> x.getId() == id).findFirst();
+            Optional<Student> student = students.stream().filter(x -> x.getId().equals(id)).findFirst();
             if (student.isPresent()) {
                 System.out.println("\nСтудент с id = " + id);
                 System.out.println("\t" + student.get());
+            } else {
+                System.out.println("\nСтудента с id = " + id + " нет в данном файле");
             }
 
         } else {
@@ -65,7 +105,17 @@ public class StudentService {
         }
     }
 
-    public void addNewStudent() {
+    private void writeUpdatedFileToServer(JsonObject updatedJsonObject) {
+        try {
+            byte[] bytes = updatedJsonObject.toString().getBytes(StandardCharsets.UTF_8);
+
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream(bytes.length);
+            ftpClient.setFileBuffer(outputStream);
+            outputStream.write(bytes, 0, bytes.length);
+            ftpClient.updateFileOnServer(outputStream);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void deleteStudentById() {

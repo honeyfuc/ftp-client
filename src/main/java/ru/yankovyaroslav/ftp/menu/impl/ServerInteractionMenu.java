@@ -36,7 +36,7 @@ public class ServerInteractionMenu implements MenuView {
                 try {
                     isUploaded = ftpClient.uploadFile(file);
                 } catch (IOException e) {
-
+                    e.printStackTrace();
                 }
                 getToNextStep(file, isUploaded);
                 break;
