@@ -1,7 +1,6 @@
 package ru.yankovyaroslav.ftp.service;
 
 import ru.yankovyaroslav.ftp.client.FTPClient;
-import ru.yankovyaroslav.ftp.domain.exception.FileDataException;
 import ru.yankovyaroslav.ftp.domain.student.Student;
 import ru.yankovyaroslav.ftp.util.UserAction;
 
@@ -50,26 +49,16 @@ public class StudentService {
     public void addNewStudent() {
         boolean isDownloaded = ftpClient.downloadFile(ftpClient.getFile());
         if (isDownloaded) {
-            System.out.print("Введите имя нового студента: ");
-            String username = UserAction.getUsername();
+            String username = getNewUsername();
             JsonObject jsonObject = readFileDataToJsonObject();
             if (jsonObject != null) {
                 JsonArray jsonArray = jsonObject.getJsonArray("students");
 
-                long currentMaxId = 0;
-                for (JsonValue value : jsonArray) {
-                    JsonObject studentObject = (JsonObject) value;
-                    long studentId = (long) studentObject.getInt("id");
-                    if (studentId > currentMaxId) {
-                        currentMaxId = studentId;
-                    }
-                }
-
-                long nextStudentId = currentMaxId + 1;
+                long nextStudentId = getNextStudentId(jsonArray);
 
                 JsonObject newStudentJsonObject = Json.createObjectBuilder()
                         .add("id", nextStudentId)
-                        .add("name",username)
+                        .add("name", username)
                         .build();
 
                 JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder(jsonArray)
@@ -84,6 +73,24 @@ public class StudentService {
         } else {
             System.out.println("\nОшибка! Вероятно, вы не загрузили файл на сервер.\nПопробуйте снова )))");
         }
+    }
+
+    private static String getNewUsername() {
+        System.out.print("Введите имя нового студента: ");
+        return UserAction.getUsername();
+    }
+
+    private static long getNextStudentId(JsonArray jsonArray) {
+        long currentMaxId = 0;
+        for (JsonValue value : jsonArray) {
+            JsonObject studentObject = (JsonObject) value;
+            long studentId = (long) studentObject.getInt("id");
+            if (studentId > currentMaxId) {
+                currentMaxId = studentId;
+            }
+        }
+
+        return currentMaxId + 1;
     }
 
     public void getStudentById() {
@@ -105,19 +112,6 @@ public class StudentService {
         }
     }
 
-    private void writeUpdatedFileToServer(JsonObject updatedJsonObject) {
-        try {
-            byte[] bytes = updatedJsonObject.toString().getBytes(StandardCharsets.UTF_8);
-
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream(bytes.length);
-            ftpClient.setFileBuffer(outputStream);
-            outputStream.write(bytes, 0, bytes.length);
-            ftpClient.updateFileOnServer(outputStream);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     public void deleteStudentById() {
     }
 
@@ -129,6 +123,16 @@ public class StudentService {
             students = parseStudents(studentsJsonArray);
         }
         return students;
+    }
+
+    private JsonObject readFileDataToJsonObject() {
+        try {
+            InputStream inputStream = new ByteArrayInputStream(ftpClient.getFileBuffer().toByteArray());
+            return Json.createReader(inputStream).readObject();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return JsonObject.EMPTY_JSON_OBJECT;
     }
 
     private List<Student> parseStudents(JsonArray jsonArray) {
@@ -143,15 +147,16 @@ public class StudentService {
         return students;
     }
 
-    private JsonObject readFileDataToJsonObject() {
+    private void writeUpdatedFileToServer(JsonObject updatedJsonObject) {
         try {
-            InputStream inputStream = new ByteArrayInputStream(ftpClient.getFileBuffer().toByteArray());
-            return Json.createReader(inputStream).readObject();
+            byte[] bytes = updatedJsonObject.toString().getBytes(StandardCharsets.UTF_8);
+
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream(bytes.length);
+            ftpClient.setFileBuffer(outputStream);
+            outputStream.write(bytes, 0, bytes.length);
+            ftpClient.updateFileOnServer(outputStream);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return JsonObject.EMPTY_JSON_OBJECT;
     }
-
-
 }
