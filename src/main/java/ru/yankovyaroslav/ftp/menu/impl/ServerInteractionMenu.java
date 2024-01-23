@@ -11,7 +11,7 @@ import java.util.Scanner;
 
 public class ServerInteractionMenu implements MenuView {
 
-    private final int MENU_OPTION_COUNT = 4;
+    private final int MENU_OPTION_COUNT = 3;
 
     private FTPClient ftpClient = FTPClient.getInstance();
 
@@ -20,8 +20,7 @@ public class ServerInteractionMenu implements MenuView {
         System.out.println("\n     Действия     ");
         System.out.println("1. Загрузить файл на сервер");
         System.out.println("2. Выбрать действие");
-        System.out.println("3. Логирование");
-        System.out.println("4. Выйти");
+        System.out.println("3. Выйти");
         handleMenuOption();
     }
 
@@ -44,8 +43,6 @@ public class ServerInteractionMenu implements MenuView {
                 showFileInteractionMenu();
                 break;
             case 3:
-                break;
-            case 4:
                 System.out.println("Выход из проиложения...");
                 System.exit(0);
             default:

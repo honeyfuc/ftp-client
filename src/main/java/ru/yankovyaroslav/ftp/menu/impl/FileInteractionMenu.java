@@ -1,5 +1,6 @@
 package ru.yankovyaroslav.ftp.menu.impl;
 
+import ru.yankovyaroslav.ftp.client.FTPClient;
 import ru.yankovyaroslav.ftp.domain.exception.FileDataException;
 import ru.yankovyaroslav.ftp.menu.MenuView;
 import ru.yankovyaroslav.ftp.service.StudentService;
@@ -17,7 +18,7 @@ public class FileInteractionMenu implements MenuView {
 
     @Override
     public void showMenu() {
-        System.out.println("\n     Работа с файлом     ");
+        System.out.println("\n     Работа с файлом (" + FTPClient.getInstance().getFile() + ")     ");
         System.out.println("1. Получить список всех студентов");
         System.out.println("2. Получить информацию о студенте по id");
         System.out.println("3. Добавить студента");

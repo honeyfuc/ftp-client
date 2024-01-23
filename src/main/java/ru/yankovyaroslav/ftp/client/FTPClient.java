@@ -74,7 +74,7 @@ public class FTPClient {
             System.out.println("WARNING! Клиент не подключен к серверу");
         }
         if (filePath != null && !filePath.isEmpty()) {
-            if (serverMode == ServerMode.PASSIVE && transferSocket == null) {
+            if (serverMode == ServerMode.PASSIVE) {
                 activatePassiveMode();
             }
             sendRequest("STOR " + filePath);
