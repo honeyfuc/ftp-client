@@ -36,10 +36,7 @@ public class StudentService {
         if (isDownloaded) {
             List<Student> students = getStudents();
             if (students != null) {
-                System.out.println("\nСписок студентов");
-                for (Student student : students) {
-                    System.out.println("\t" + student);
-                }
+                printAllStudents(students);
             }
         } else {
             System.out.println("\nОшибка! Вероятно, вы не загрузили файл на сервер.\nПопробуйте снова )))");
@@ -75,6 +72,59 @@ public class StudentService {
         }
     }
 
+    public void getStudentById() {
+        boolean isDownloaded = ftpClient.downloadFile(ftpClient.getFile());
+        if (isDownloaded) {
+            long id = getStudentId();
+            List<Student> students = getStudents();
+            Optional<Student> student = students.stream().filter(x -> x.getId().equals(id)).findFirst();
+            if (student.isPresent()) {
+                System.out.println("\nСтудент с id = " + id);
+                System.out.println("\t" + student.get());
+            } else {
+                System.out.println("\nСтудента с id = " + id + " нет в данном файле");
+            }
+
+        } else {
+            System.out.println("\nОшибка! Вероятно, вы не загрузили файл на сервер.\nПопробуйте снова )))");
+        }
+    }
+
+    public void deleteStudentById() {
+        boolean isDownloaded = ftpClient.downloadFile(ftpClient.getFile());
+        if (isDownloaded) {
+            long studentId = getStudentId();
+            JsonObject jsonObject = readFileDataToJsonObject();
+            if (jsonObject != null) {
+                JsonArray studentsJsonArray = jsonObject.getJsonArray("students");
+                if (studentId < 0 || studentId > studentsJsonArray.size()) {
+                    System.out.println("\nСтудента с id = " + studentId + " нет в данном файле");
+                } else {
+                    JsonArrayBuilder updatedStudentJsonArray = Json.createArrayBuilder();
+                    for (JsonValue value : studentsJsonArray) {
+                        JsonObject studentJsonObject = (JsonObject) value;
+                        long id = studentJsonObject.getInt("id");
+                        if (studentId != id) {
+                            updatedStudentJsonArray.add(studentJsonObject);
+                        }
+                    }
+                    JsonObjectBuilder updatedJsonObject = Json.createObjectBuilder(jsonObject);
+                    updatedJsonObject.remove("students");
+                    updatedJsonObject.add("students", updatedStudentJsonArray.build());
+                    writeUpdatedFileToServer(updatedJsonObject.build());
+                    System.out.println("\nСтудент с id = " + studentId + " успешно удалён!");
+                }
+            }
+        } else {
+            System.out.println("\nОшибка! Вероятно, вы не загрузили файл на сервер.\nПопробуйте снова )))");
+        }
+    }
+
+    private static long getStudentId() {
+        System.out.print("Введите id студента: ");
+        return UserAction.getUserId();
+    }
+
     private static String getNewUsername() {
         System.out.print("Введите имя нового студента: ");
         return UserAction.getUsername();
@@ -93,26 +143,11 @@ public class StudentService {
         return currentMaxId + 1;
     }
 
-    public void getStudentById() {
-        boolean isDownloaded = ftpClient.downloadFile(ftpClient.getFile());
-        if (isDownloaded) {
-            System.out.print("Введите id студента: ");
-            long id = UserAction.getUserId();
-            List<Student> students = getStudents();
-            Optional<Student> student = students.stream().filter(x -> x.getId().equals(id)).findFirst();
-            if (student.isPresent()) {
-                System.out.println("\nСтудент с id = " + id);
-                System.out.println("\t" + student.get());
-            } else {
-                System.out.println("\nСтудента с id = " + id + " нет в данном файле");
-            }
-
-        } else {
-            System.out.println("\nОшибка! Вероятно, вы не загрузили файл на сервер.\nПопробуйте снова )))");
+    private static void printAllStudents(List<Student> students) {
+        System.out.println("\nСписок студентов");
+        for (Student student : students) {
+            System.out.println("\t" + student);
         }
-    }
-
-    public void deleteStudentById() {
     }
 
     private List<Student> getStudents() {

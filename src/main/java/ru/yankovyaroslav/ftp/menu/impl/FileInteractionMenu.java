@@ -44,6 +44,7 @@ public class FileInteractionMenu implements MenuView {
                 break;
             case 4:
                 studentService.deleteStudentById();
+                showMenu();
                 break;
             case 5:
                 showServerInteractionMenu();

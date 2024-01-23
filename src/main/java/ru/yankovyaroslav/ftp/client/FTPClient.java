@@ -103,7 +103,9 @@ public class FTPClient {
     }
 
     public boolean downloadFile(String fileName) {
-        activatePassiveMode();
+        if (serverMode == ServerMode.PASSIVE) {
+            activatePassiveMode();
+        }
         try {
             sendRequest("RETR " + fileName);
             String serverResponse = serverReader.readLine();
@@ -128,9 +130,9 @@ public class FTPClient {
     }
 
     public void updateFileOnServer(ByteArrayOutputStream outputStream) {
-
-        activatePassiveMode();
-
+        if (serverMode == ServerMode.PASSIVE) {
+            activatePassiveMode();
+        }
         try {
             if (file != null && !file.isEmpty()) {
                 sendRequest("STOR " + file);
