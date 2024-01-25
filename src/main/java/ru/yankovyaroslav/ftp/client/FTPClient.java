@@ -290,4 +290,56 @@ public class FTPClient {
     public void setServerMode(ServerMode serverMode) {
         this.serverMode = serverMode;
     }
+
+    public String getServerHost() {
+        return serverHost;
+    }
+
+    public void setServerHost(String serverHost) {
+        this.serverHost = serverHost;
+    }
+
+    public int getServerPort() {
+        return serverPort;
+    }
+
+    public void setServerPort(int serverPort) {
+        this.serverPort = serverPort;
+    }
+
+    public Socket getConnectionSocket() {
+        return connectionSocket;
+    }
+
+    public void setConnectionSocket(Socket connectionSocket) {
+        this.connectionSocket = connectionSocket;
+    }
+
+    public Socket getTransferSocket() {
+        return transferSocket;
+    }
+
+    public void setTransferSocket(Socket transferSocket) {
+        this.transferSocket = transferSocket;
+    }
+
+    public BufferedReader getServerReader() {
+        return serverReader;
+    }
+
+    public void setServerReader(BufferedReader serverReader) {
+        this.serverReader = serverReader;
+    }
+
+    public BufferedWriter getServerWriter() {
+        return serverWriter;
+    }
+
+    public void setServerWriter(BufferedWriter serverWriter) {
+        this.serverWriter = serverWriter;
+    }
+
+    public void setFile(String file) {
+        this.file = file;
+    }
 }
