@@ -59,6 +59,7 @@ public class FTPClient {
             serverWriter = new BufferedWriter(new OutputStreamWriter(connectionSocket.getOutputStream()));
             String serverResponse = serverReader.readLine();
             if (!serverResponse.startsWith("220 ")) {
+                resetState();
                 throw new FtpServerConnectionException("Ошибка при соединении с FTP сервером");
             }
 
@@ -199,9 +200,8 @@ public class FTPClient {
     }
 
     private static void redirectToConnectionMenu() {
-        System.out.println("Ошибка при соединении с FTP сервером");
         FtpServerConnectionMenu ftpServerConnectionMenu = new FtpServerConnectionMenu();
-        ftpServerConnectionMenu.showMenu();
+        ftpServerConnectionMenu.showError("Ошибка при соединении с FTP сервером");
     }
 
     private void authenticate(String username, String password) throws IOException {
@@ -213,9 +213,11 @@ public class FTPClient {
             if (serverResponse.startsWith("230")) {
                 isConnected = true;
             } else {
+                resetState();
                 throw new FtpServerConnectionException("Ошибка при соединении с FTP сервером");
             }
         } else {
+            resetState();
             throw new FtpServerConnectionException("Ошибка при соединении с FTP сервером");
         }
     }
@@ -233,6 +235,40 @@ public class FTPClient {
                 throw new RuntimeException(ex);
             }
         }
+    }
+
+    private void closeResources() {
+        closeQuietly(connectionSocket);
+        closeQuietly(transferSocket);
+        closeQuietly(serverReader);
+        closeQuietly(serverWriter);
+    }
+
+    private void closeQuietly(Closeable closeable) {
+        if (closeable != null) {
+            try {
+                closeable.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void resetState() {
+        closeResources();
+        host = null;
+        username = null;
+        password = null;
+        serverHost = null;
+        serverPort = 0;
+        serverMode = null;
+        isConnected = false;
+        connectionSocket = null;
+        transferSocket = null;
+        serverReader = null;
+        serverWriter = null;
+        file = null;
+        fileBuffer = null;
     }
 
     public String getHost() {

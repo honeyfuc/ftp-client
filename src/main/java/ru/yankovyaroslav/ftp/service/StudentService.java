@@ -72,10 +72,9 @@ public class StudentService {
         }
     }
 
-    public void getStudentById() {
+    public void getStudentById(long id) {
         boolean isDownloaded = ftpClient.downloadFile(ftpClient.getFile());
         if (isDownloaded) {
-            long id = getStudentId();
             List<Student> students = getStudents();
             Optional<Student> student = students.stream().filter(x -> x.getId().equals(id)).findFirst();
             if (student.isPresent()) {
@@ -90,10 +89,9 @@ public class StudentService {
         }
     }
 
-    public void deleteStudentById() {
+    public void deleteStudentById(long studentId) {
         boolean isDownloaded = ftpClient.downloadFile(ftpClient.getFile());
         if (isDownloaded) {
-            long studentId = getStudentId();
             JsonObject jsonObject = readFileDataToJsonObject();
             if (jsonObject != null) {
                 JsonArray studentsJsonArray = jsonObject.getJsonArray("students");
@@ -118,11 +116,6 @@ public class StudentService {
         } else {
             System.out.println("\nОшибка! Вероятно, вы не загрузили файл на сервер.\nПопробуйте снова )))");
         }
-    }
-
-    private static long getStudentId() {
-        System.out.print("Введите id студента: ");
-        return UserAction.getUserId();
     }
 
     private static String getNewUsername() {

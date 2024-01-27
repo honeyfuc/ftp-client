@@ -35,6 +35,11 @@ public class FtpServerConnectionMenu implements MenuView {
         return ftpClient.isConnected();
     }
 
+    public void showError(String errorMessage) {
+        System.out.println("Ошибка при соединении с FTP сервером");
+        showMenu();
+    }
+
     private static void showServerModeMenu() {
         ServerModeMenu serverModeMenu = new ServerModeMenu();
         serverModeMenu.showMenu();

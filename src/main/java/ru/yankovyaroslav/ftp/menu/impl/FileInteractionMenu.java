@@ -36,7 +36,8 @@ public class FileInteractionMenu implements MenuView {
                 showMenu();
                 break;
             case 2:
-                studentService.getStudentById();
+                long studentId = getStudentId();
+                studentService.getStudentById(studentId);
                 showMenu();
                 break;
             case 3:
@@ -44,7 +45,8 @@ public class FileInteractionMenu implements MenuView {
                 showMenu();
                 break;
             case 4:
-                studentService.deleteStudentById();
+                long id = getStudentId();
+                studentService.deleteStudentById(id);
                 showMenu();
                 break;
             case 5:
@@ -59,6 +61,11 @@ public class FileInteractionMenu implements MenuView {
     private static void showServerInteractionMenu() {
         ServerInteractionMenu serverInteractionMenu = new ServerInteractionMenu();
         serverInteractionMenu.showMenu();
+    }
+
+    private static long getStudentId() {
+        System.out.print("Введите id студента: ");
+        return UserAction.getUserId();
     }
 
 }
