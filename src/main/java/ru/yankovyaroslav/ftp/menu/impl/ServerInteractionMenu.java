@@ -35,7 +35,7 @@ public class ServerInteractionMenu implements MenuView {
                 try {
                     isUploaded = ftpClient.uploadFile(file);
                 } catch (IOException e) {
-                    System.out.println("Файл " + file + " не лежит на сервере");
+
                 }
                 getToNextStep(file, isUploaded);
                 break;

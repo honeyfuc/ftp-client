@@ -166,8 +166,7 @@ public class FTPClient {
 
             transferSocket = new Socket(serverHost, serverPort);
 
-            System.out.println("SUCCESSFUL !!! Пассивный режим успешно включен! Адресс: " + serverHost + ". Порт " + serverPort);
-
+            System.out.println("\nSUCCESSFUL !!! Пассивный режим успешно включен! Адресс: " + serverHost + ". Порт " + serverPort);
         } catch (FtpServerConnectionException e) {
             System.out.println("Возникла ошибка при включении Пассивного режима работы");
         } catch (IOException e) {

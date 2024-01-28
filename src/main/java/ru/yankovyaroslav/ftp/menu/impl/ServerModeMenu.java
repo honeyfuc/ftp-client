@@ -29,7 +29,12 @@ public class ServerModeMenu implements MenuView {
                 showServerInteractionMenu();
                 break;
             case 2:
-                System.out.println("Выход из приложения...");
+                System.out.println("\nК сожалению, реализация работы в активном режиме с FTP сервером недоступна.");
+                System.out.println("Проблемы возникли, как я успел разобраться, по причине использования локальной машиной");
+                System.out.println("брандмауэра или NAT шлюза. Вы будете автоматически использовать пассивный режим взаимодействия");
+                System.out.println("в последующем.");
+                ftpClient.setServerMode(ServerMode.PASSIVE);
+                showServerInteractionMenu();
                 break;
             default:
                 this.showMenu();
